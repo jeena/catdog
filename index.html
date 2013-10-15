@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Cat vs. dog drawings categorization : A university project" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Cat vs. dog drawings categorization</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jeena/catdog">View on GitHub</a>
+
+          <h1 id="project_title">Cat vs. dog drawings categorization</h1>
+          <h2 id="project_tagline">A university project</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jeena/catdog/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jeena/catdog/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="1-introduction" class="anchor" href="#1-introduction"><span class="octicon octicon-link"></span></a>1. Introduction</h1>
+
+<h2>
+<a name="11-goal" class="anchor" href="#11-goal"><span class="octicon octicon-link"></span></a>1.1. Goal</h2>
+
+<p>The goal of this project was to give a computer a drawing of either a cat's or a dog's face and let it recognize with high probability whether a cat or a dog is shown.</p>
+
+<h2>
+<a name="12-scope" class="anchor" href="#12-scope"><span class="octicon octicon-link"></span></a>1.2. Scope</h2>
+
+<p>First I thought that I would get lots of people to draw cat and dog faces for me, but I later realized that it was far too time consuming. Therefore I had to change the scope from recognizing random peoples drawings to recognizing my own drawings, which is obviously easier. Everything else did not change that much, I would just get better results.</p>
+
+<h1>
+<a name="2-preparation" class="anchor" href="#2-preparation"><span class="octicon octicon-link"></span></a>2. Preparation</h1>
+
+<h2>
+<a name="21-drawing-and-taking-a-photo" class="anchor" href="#21-drawing-and-taking-a-photo"><span class="octicon octicon-link"></span></a>2.1. Drawing and taking a photo</h2>
+
+<p><img src="https://jeena.net/images/2013/catdog/drawing-taking-photo.jpg" alt="The raw drawings"></p>
+
+<p>I drew eight A4 sheets of such cat and dog faces which resulted in 64 dog faces and 60 cat faces. Then I took pictures of them with my digital camera.</p>
+
+<p>There was a huge difference in quality between the pictures I took with my iPhone 4 camera and the ones I took with my Nikon D5000. In fact I was not able to use the pictures I took with the iPhone because it was impossible to find straight lines in them.</p>
+
+<p>You can see the result here, one with the iPhone image as a source and the other with the Nikon image:</p>
+
+<p><img src="https://jeena.net/images/2013/catdog/iphone-sample.jpg" alt="iPhone vs. Nikon sample"></p>
+
+<h2>
+<a name="22-photoshop" class="anchor" href="#22-photoshop"><span class="octicon octicon-link"></span></a>2.2. Photoshop</h2>
+
+<p>I cleaned up the drawings so it would be easier for the algorithm to find everything. I opened the pictures of the drawings in Photoshop and played with the contrast and brightness settings.</p>
+
+<p>Then I cut out all the drawings from the big image and saved them as a black and white PNG images without dither.</p>
+
+<p><img src="https://jeena.net/images/2013/catdog/photoshop.jpg" alt="Steps in Photoshop"></p>
+
+<h2>
+<a name="23-resizing" class="anchor" href="#23-resizing"><span class="octicon octicon-link"></span></a>2.3. Resizing</h2>
+
+<p>I wrote a small shellscript which would take all pictures and resize them proportionally to a max width and height of 200 px. It also fills up the missing borders with a white background color. To do that I used the <a href="www.imagemagick.org">ImageMagick</a> software suite:</p>
+
+<pre>#!/bin/sh
+
+NEW="new_$1"
+rm -rf $NEW
+mkdir $NEW
+
+for i in `ls -1 $1`
+do
+    convert $1/$i \
+        -adaptive-resize 200x200\&gt; \
+        -size 200x200 xc:white +swap \
+        -gravity center \
+        -composite \
+        $NEW/$i
+done</pre>
+
+<p>After that all the images had uniform sizes and colors so that I was able to compare them in a meaningful way.</p>
+
+<h1>
+<a name="3-feature-extraction" class="anchor" href="#3-feature-extraction"><span class="octicon octicon-link"></span></a>3. Feature extraction</h1>
+
+<p>The next step was to extract the features from the images. In other words find things in the pictures that would be unique enough to make a difference between cats and dogs but broad enough so that all dogs would fall into one category and all cats into the other.</p>
+
+<h2>
+<a name="31-straight-lines" class="anchor" href="#31-straight-lines"><span class="octicon octicon-link"></span></a>3.1. Straight lines</h2>
+
+<p>The first thing which came to mind was counting and doing other stuff with straight lines in the image.</p>
+
+<h3>
+<a name="311-canny-edge-detector" class="anchor" href="#311-canny-edge-detector"><span class="octicon octicon-link"></span></a>3.1.1 Canny edge detector</h3>
+
+<p>I used an edge detector algorithm called Canny to preprocess the images which - as the name implies - finds edges in images. Because of my preparation with Photoshop it was quite easy for it to find them. It is not easy to see this step with my drawings, so here is a picture of how it looks like when you do this with a photo instead:</p>
+
+<p><img src="https://jeena.net/images/2013/catdog/canny.jpg" alt="Canny on a photo from Wikipedia"></p>
+
+<p>It basically removes noise with a gausian filter and then finds the intentisty gradians of the image with help of some trigonometry.</p>
+
+<p>I did not implement the algorithm myself, instead I used the often used <a href="http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html">OpenCV implementation</a>.</p>
+
+<h3>
+<a name="312-hough-transform" class="anchor" href="#312-hough-transform"><span class="octicon octicon-link"></span></a>3.1.2 Hough transform</h3>
+
+<p>To find the lines I used the <a href="https://en.wikipedia.org/wiki/Hough_transform">Hough transform</a> algorithm. The red lines are those which the Hough transform algorithm found in the example picture:</p>
+
+<p><img src="https://jeena.net/images/2013/catdog/hough.png" alt="Hough lines"></p>
+
+<p>It essentially groups edges, which can be imperfect, to object candidates by performing an explicit voting procedure. Detecting straight lines can be done by describing them as <code>y = mx + b</code> where <code>m</code> is the slope of the line and <code>b</code> is the intercept. The line is not represented by descrete points <code>(x1,y1)(x2,y2)</code> but instead as a <code>point(x,y)</code> in the parameter space, which makes detection of lines, which are a bit off, possible. In practice it is still more complicated, please read the <a href="https://en.wikipedia.org/wiki/Hough_transform">Wikipedia article</a> about it.</p>
+
+<p>I did not implement it myself but used the often used and tested probabilistic <a href="http://docs.opencv.org/modules/imgproc/doc/feature_detection.html?highlight=houghlinesp#houghlinesp">OpenCV implementation</a>.</p>
+
+<h2>
+<a name="32-line-features" class="anchor" href="#32-line-features"><span class="octicon octicon-link"></span></a>3.2. Line features</h2>
+
+<p>I extracted these features from the lines:</p>
+
+<ul>
+<li>amount of lines</li>
+<li>average length of lines</li>
+<li>average angle of lines</li>
+</ul><h2>
+<a name="33-other-features" class="anchor" href="#33-other-features"><span class="octicon octicon-link"></span></a>3.3. Other features</h2>
+
+<p>I also extracted the amount of black pixels in the image to use it as a possible feature which was not using the extracted lines.</p>
+
+<h1>
+<a name="4-k-nearest-neighbor-algorithm" class="anchor" href="#4-k-nearest-neighbor-algorithm"><span class="octicon octicon-link"></span></a>4. <em>k</em>-nearest neighbor algorithm</h1>
+
+<p>I chose to use the <em>k</em>-Nearest Neighbors algorithm which only locally looks at the neighbors of the document in a radius predefined by the user. It assumes that the document is of the same category as the highest number of neighbors within this radius.
+In the following figure you can see that depending if the user choses k = 3, as shown by the solid line, the algorithm will conclude that the document in the center (green smiley) is of the type triangle because most of this three neighbors are triangles. If on the other hand the user choses k = 7, as shown by the dotted line, then the amount of neighbors which are rectangles is greater as the amount of neighbors which are triangles, so it concludes that the smiley is of type rectangle.</p>
+
+<p><img src="https://jeena.net/images/2013/catdog/k-nearest-neighbours.png" alt="k-Nearest Neighbours as a graphic"></p>
+
+<p>In the picture above you see how it would look with two dimensions. I have been using four features so the algorithm had to check the distance to the neighbours in four dimensions. This is not really more difficult, it is just more to calculate.</p>
+
+<h1>
+<a name="5-results" class="anchor" href="#5-results"><span class="octicon octicon-link"></span></a>5. Results</h1>
+
+<p>The results were quite encouraging, I assume it is because I only used one style to draw the dogs and one style to draw the cats.</p>
+
+<h2>
+<a name="51-k-fold-cross-validation" class="anchor" href="#51-k-fold-cross-validation"><span class="octicon octicon-link"></span></a>5.1. k-fold Cross-validation</h2>
+
+<p>I used 10 fold cross-validation for every test I did, which means that I used 90% of the available data for the learning algorithms and then the remaining 10% to test how they performed. I repeated this ten times until all data had been used for testing once.</p>
+
+<h2>
+<a name="52-results-with-all-features" class="anchor" href="#52-results-with-all-features"><span class="octicon octicon-link"></span></a>5.2. Results with all features</h2>
+
+<p>When I used all of the features and three nearest neighbours I got amazing 100% accuracy, which was kind of suspect because that normally means that you most probably did something wrong.</p>
+
+<h2>
+<a name="53-results-with-a-reduced-feature-set" class="anchor" href="#53-results-with-a-reduced-feature-set"><span class="octicon octicon-link"></span></a>5.3. Results with a reduced feature set</h2>
+
+<p>Therefore I tried to reduce the features to check if it would perform worse.</p>
+
+<ol>
+<li>When I removed the information about the amount of black pixels basically nothing happened.</li>
+<li>When I removed the information about the amount of lines and average length at least I got a couple of wrong categorized images, the accuracy went down to 95%.</li>
+<li>When I removed the information about the average angle of the lines, that was when I got significant errors. The accuracy dropped down to about 60%, which is still better then pure chance.</li>
+</ol><p>So it seems like the best feature to detect cat and dog face drawings done by me was the average angle of the straight lines in the image.</p>
+
+<h1>
+<a name="6-future-study" class="anchor" href="#6-future-study"><span class="octicon octicon-link"></span></a>6. Future study</h1>
+
+<p>The most important next step would be to gather many more drawings done by other people who use other styles to draw cat and dog faces.</p>
+
+<p>Then it would be interesting to use other learning algorithms like Bayes, Perceptron, etc.</p>
+
+<p>And then it would be interesting to use this approach on photos of real cats and dogs.</p>
+
+<h1>
+<a name="7-code" class="anchor" href="#7-code"><span class="octicon octicon-link"></span></a>7. Code</h1>
+
+<pre><code>#!/usr/bin/env python
+
+import cv2, cv, sys, math, os, numpy
+from scipy.spatial import KDTree
+
+def extractFeatures(label):
+
+    directory = "img/" + label + "/"
+
+    features = []
+
+    for fn in os.listdir(directory):
+
+        img = cv2.imread(directory + fn, 0)
+
+        # find edges
+        canny = cv2.Canny(img, 50, 100)
+
+        # find colored
+        black_pixels = numpy.count_nonzero(img)
+
+        # find lines lines
+        lines = cv2.HoughLinesP(canny, 1, math.pi/360, 5, None, 10, 1)
+
+        lengths = []
+        angles = []
+        try:
+            for line in lines[0]:
+                x1, y1, x2, y2 = line
+
+                # Pythagoras
+                a2 = math.pow((x1-x2), 2)
+                b2 = math.pow((y1-y2), 2)
+                length = int(math.sqrt(a2 + b2))
+                lengths.append(length)
+
+                angle = int(math.degrees(math.atan((y1-y2) / (x1-x2))))
+                angles.append(angle)
+        except:
+            pass
+
+        # print out everything
+        lines_count = len(lengths)
+        mid_length = sum(lengths) / lines_count
+        mid_angle = sum(angles) / lines_count
+
+        features.append([
+            [lines_count, mid_length, mid_angle, black_pixels],
+            label
+        ])
+
+    return features
+
+
+if __name__ == "__main__":
+    cats = extractFeatures("cat")
+    dogs = extractFeatures("dog")
+
+    test_count = 5
+
+    test_data = dogs[:test_count] + cats[:test_count] 
+    test_labels = map(lambda a: a[1], test_data)
+    test_features = map(lambda a: a[0], test_data)
+
+    data = cats[test_count:] + dogs[test_count:]
+    labels = map(lambda a: a[1], data)
+    features = map(lambda a: a[0], data)
+
+    tree = KDTree(features)
+
+    for t in xrange(0, test_count * 2):
+        d, i = tree.query(test_features[t], k=3)
+        print "-"
+        for j in xrange(0, len(i)):
+            print test_labels[t] + " is a " + labels[i[j]]
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Cat vs. dog drawings categorization maintained by <a href="https://github.com/jeena">jeena</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
