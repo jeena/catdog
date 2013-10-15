@@ -2,7 +2,7 @@
 
 ## 1.1. Goal
 
-The goal with this project was to give a computer a drawing of either a cats or a dogs face and let it with high probability predict if it is a cat or a dog shown in that drawing.
+The goal with this project was to give a computer a drawing of either a cat's or a dog's face and let it with high probability predict if it is a cat or a dog shown in that drawing.
 
 ## 1.2. Scope
 
@@ -32,7 +32,7 @@ Then I cut out one drawing after another from the big image and saved it as a bl
 
 ## 2.3. Resizing
 
-I wrote a small shellscript which would take all pictures resize them proportionally to a max width and height of 200 px and fill up the missibg borders with a white background color. To do that I used the [ImageMagick suite](www.imagemagick.org) software suite:
+I wrote a small shellscript which would take all pictures resize them proportionally to a max width and height of 200 px and fill up the missibg borders with a white background color. To do that I used the [ImageMagick](www.imagemagick.org) software suite:
 
 <pre>#!/bin/sh
 
