@@ -68,7 +68,7 @@ I used an edge detector algorithm called Canny to preprocess the images which - 
 
 It basically removes noise with a gausian filter and then finds the intentisty gradians of the image with help of some trigonometry.
 
-I did not implement the algorithm myself, instead I used the [OpenCV implementation](http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html).
+I did not implement the algorithm myself, instead I used the often used [OpenCV implementation](http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html).
 
 ### 3.1.2 Hough transform
 
@@ -78,7 +78,7 @@ To find the lines I used the [Hough transform](https://en.wikipedia.org/wiki/Hou
 
 It essentially groups edges, which can be imperfect, to object candidates by performing an explicit voting procedure. Detecting straight lines can be done by describing them as <code>y = mx + b</code> where <code>m</code> is the slope of the line and <code>b</code> is the intercept. The line is not represented by descrete points <code>(x1,y1)(x2,y2)</code> but instead as a <code>point(x,y)</code> in the parameter space, which makes detection of lines, which are a bit off, possible. In practice it is still more complicated, please read the [Wikipedia article](https://en.wikipedia.org/wiki/Hough_transform) about it.
 
-Because of lack of time I did not implement it myself but used the probabilistic [OpenCV implementation](http://docs.opencv.org/modules/imgproc/doc/feature_detection.html?highlight=houghlinesp#houghlinesp).
+I did not implement it myself but used the often used and tested probabilistic [OpenCV implementation](http://docs.opencv.org/modules/imgproc/doc/feature_detection.html?highlight=houghlinesp#houghlinesp).
 
 ## 3.2. Line features
 
