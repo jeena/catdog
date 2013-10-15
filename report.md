@@ -76,7 +76,7 @@ To find the lines I used the [Hough transform](https://en.wikipedia.org/wiki/Hou
 
 ![Hough lines](https://jeena.net/images/2013/catdog/hough.png)
 
-It essentially groups edges, which can be imperfect, to object candidates by performing an explicit voting procedure. Detecting straight lines can be done by describing them as <code>y = mx + b</code> where <code>m</code> is the slope of the line and <code>b</code> is the intercept. The line is not represented by descrete points <code>(x1,y1)(x2,y2)</code> but instead as a <code>point(x,y)</code> in the parameter space, which makes detection of lines which are a bit off possible. In practice it is still more complicated, please read the [Wikipedia article](https://en.wikipedia.org/wiki/Hough_transform) about it.
+It essentially groups edges, which can be imperfect, to object candidates by performing an explicit voting procedure. Detecting straight lines can be done by describing them as <code>y = mx + b</code> where <code>m</code> is the slope of the line and <code>b</code> is the intercept. The line is not represented by descrete points <code>(x1,y1)(x2,y2)</code> but instead as a <code>point(x,y)</code> in the parameter space, which makes detection of lines, which are a bit off, possible. In practice it is still more complicated, please read the [Wikipedia article](https://en.wikipedia.org/wiki/Hough_transform) about it.
 
 Because of lack of time I did not implement it myself but used the probabilistic [OpenCV implementation](http://docs.opencv.org/modules/imgproc/doc/feature_detection.html?highlight=houghlinesp#houghlinesp).
 
