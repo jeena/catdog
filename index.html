@@ -186,82 +186,82 @@ In the following figure you can see that depending if the user choses k = 3, as 
 <h1>
 <a name="7-code" class="anchor" href="#7-code"><span class="octicon octicon-link"></span></a>7. Code</h1>
 
-<pre><code>#!/usr/bin/env python
+<div class="highlight highlight-python"><pre><span class="c">#!/usr/bin/env python</span>
 
-import cv2, cv, sys, math, os, numpy
-from scipy.spatial import KDTree
+<span class="kn">import</span> <span class="nn">cv2</span><span class="o">,</span> <span class="nn">cv</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">KDTree</span>
 
-def extractFeatures(label):
+<span class="k">def</span> <span class="nf">extractFeatures</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
 
-    directory = "img/" + label + "/"
+    <span class="n">directory</span> <span class="o">=</span> <span class="s">"img/"</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s">"/"</span>
 
-    features = []
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
 
-    for fn in os.listdir(directory):
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
 
-        img = cv2.imread(directory + fn, 0)
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">directory</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        # find edges
-        canny = cv2.Canny(img, 50, 100)
+        <span class="c"># find edges</span>
+        <span class="n">canny</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Canny</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
-        # find colored
-        black_pixels = numpy.count_nonzero(img)
+        <span class="c"># find colored</span>
+        <span class="n">black_pixels</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
-        # find lines lines
-        lines = cv2.HoughLinesP(canny, 1, math.pi/360, 5, None, 10, 1)
+        <span class="c"># find lines lines</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">HoughLinesP</span><span class="p">(</span><span class="n">canny</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">360</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        lengths = []
-        angles = []
-        try:
-            for line in lines[0]:
-                x1, y1, x2, y2 = line
+        <span class="n">lengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">line</span>
 
-                # Pythagoras
-                a2 = math.pow((x1-x2), 2)
-                b2 = math.pow((y1-y2), 2)
-                length = int(math.sqrt(a2 + b2))
-                lengths.append(length)
+                <span class="c"># Pythagoras</span>
+                <span class="n">a2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">x1</span><span class="o">-</span><span class="n">x2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">b2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">y2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">))</span>
+                <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
 
-                angle = int(math.degrees(math.atan((y1-y2) / (x1-x2))))
-                angles.append(angle)
-        except:
-            pass
+                <span class="n">angle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">y2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x1</span><span class="o">-</span><span class="n">x2</span><span class="p">))))</span>
+                <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
 
-        # print out everything
-        lines_count = len(lengths)
-        mid_length = sum(lengths) / lines_count
-        mid_angle = sum(angles) / lines_count
+        <span class="c"># print out everything</span>
+        <span class="n">lines_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="n">mid_length</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">/</span> <span class="n">lines_count</span>
+        <span class="n">mid_angle</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">/</span> <span class="n">lines_count</span>
 
-        features.append([
-            [lines_count, mid_length, mid_angle, black_pixels],
-            label
-        ])
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+            <span class="p">[</span><span class="n">lines_count</span><span class="p">,</span> <span class="n">mid_length</span><span class="p">,</span> <span class="n">mid_angle</span><span class="p">,</span> <span class="n">black_pixels</span><span class="p">],</span>
+            <span class="n">label</span>
+        <span class="p">])</span>
 
-    return features
+    <span class="k">return</span> <span class="n">features</span>
 
 
-if __name__ == "__main__":
-    cats = extractFeatures("cat")
-    dogs = extractFeatures("dog")
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">cats</span> <span class="o">=</span> <span class="n">extractFeatures</span><span class="p">(</span><span class="s">"cat"</span><span class="p">)</span>
+    <span class="n">dogs</span> <span class="o">=</span> <span class="n">extractFeatures</span><span class="p">(</span><span class="s">"dog"</span><span class="p">)</span>
 
-    test_count = 5
+    <span class="n">test_count</span> <span class="o">=</span> <span class="mi">5</span>
 
-    test_data = dogs[:test_count] + cats[:test_count] 
-    test_labels = map(lambda a: a[1], test_data)
-    test_features = map(lambda a: a[0], test_data)
+    <span class="n">test_data</span> <span class="o">=</span> <span class="n">dogs</span><span class="p">[:</span><span class="n">test_count</span><span class="p">]</span> <span class="o">+</span> <span class="n">cats</span><span class="p">[:</span><span class="n">test_count</span><span class="p">]</span> 
+    <span class="n">test_labels</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">test_data</span><span class="p">)</span>
+    <span class="n">test_features</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">test_data</span><span class="p">)</span>
 
-    data = cats[test_count:] + dogs[test_count:]
-    labels = map(lambda a: a[1], data)
-    features = map(lambda a: a[0], data)
+    <span class="n">data</span> <span class="o">=</span> <span class="n">cats</span><span class="p">[</span><span class="n">test_count</span><span class="p">:]</span> <span class="o">+</span> <span class="n">dogs</span><span class="p">[</span><span class="n">test_count</span><span class="p">:]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
 
-    tree = KDTree(features)
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
 
-    for t in xrange(0, test_count * 2):
-        d, i = tree.query(test_features[t], k=3)
-        print "-"
-        for j in xrange(0, len(i)):
-            print test_labels[t] + " is a " + labels[i[j]]
-</code></pre>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">test_count</span> <span class="o">*</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">test_features</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"-"</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
+            <span class="k">print</span> <span class="n">test_labels</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="s">" is a "</span> <span class="o">+</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+</pre></div>
       </section>
     </div>
 
