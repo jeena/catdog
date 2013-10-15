@@ -95,7 +95,7 @@ I also extracted the amount of black pixels in the image to use it as a possible
 # 4. _k_-nearest neighbor algorithm
 
 I chose to use the _k_-Nearest Neighbors algorithm which only locally looks at the neighbors of the document in a radius predefined by the user. It assumes that the document is of the same category as the highest number of neighbors within this radius.
-In the following figure you can see that depending if the user choses k = 3, as showed by the solid line, the algorithm will conclude that the document in the center (green smiley) is of the type triangle because most of this three neighbors are triangles. If on the other hand the user choses k = 7, as showed by the dotted line, then the amount of neighbors which are rectangles is greater as the amount of neighbors which are triangles, so it concludes that the smiley is of type rectangle.
+In the following figure you can see that depending if the user choses k = 3, as shown by the solid line, the algorithm will conclude that the document in the center (green smiley) is of the type triangle because most of this three neighbors are triangles. If on the other hand the user choses k = 7, as showed by the dotted line, then the amount of neighbors which are rectangles is greater as the amount of neighbors which are triangles, so it concludes that the smiley is of type rectangle.
 
 ![k-Nearest Neighbours as a graphic](https://jeena.net/images/2013/catdog/k-nearest-neighbours.png)
 
